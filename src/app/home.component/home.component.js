@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { SecretDataService } from '../services/secret.data.service'
 import { UserService } from '../services/user.service'
+import { Observable } from 'rxjs/Rx'
 
 @Component({
   template: `<h1>HOME</h1>
@@ -15,10 +16,17 @@ export class HomeComponent {
   }
 
   ngOnInit() {
-    this.data = this.userService.currentUser
+    this.userService.currentUser
       .map(user => user.Zi.id_token)
-      .flatMap(token => this.secretDataService.getData(token))
+      .flatMap(token => {
+        if (token) {
+          return this.secretDataService.getData(token)
+        } else {
+          return Observable.empty();
+        }
+      })
       .map(resp => resp.json())
+      .startWith({message: "loading..."})
       .subscribe(resp => this.resp = resp)
   }
 

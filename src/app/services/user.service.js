@@ -41,7 +41,7 @@ export class UserService {
 
   purgeAuth() {
     // Set current user to an empty object
-    this.currentUserSubject.next(null)
+    this.currentUserSubject.next({Zi: {id_token: null}})
     this.currentUserProfileSubject.next(null)
     // Set auth status to false
     this.isAuthenticatedSubject.next(false)
