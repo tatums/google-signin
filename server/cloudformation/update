@@ -1,0 +1,9 @@
+#!/bin/bash
+
+aws cloudformation update-stack \
+  --stack-name $PROJECT_NAME \
+  --template-body file://cloudformation.yaml \
+  --capabilities CAPABILITY_NAMED_IAM  && \
+
+  aws cloudformation wait stack-update-complete \
+  --stack-name $PROJECT_NAME

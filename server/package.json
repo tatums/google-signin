@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cloudformation:create": "./cloudformation/create",
+    "cloudformation:update": "./cloudformation/update",
+    "cloudformation:delete": "./cloudformation/delete",
+    "lambda:zip": "npm i --production && zip -q -r lambda.zip *",
+    "lambda:update-fn": "aws lambda update-function-code --function-name $PROJECT_NAME --zip-file fileb://lambda.zip",
+    "lambda:deploy": "npm run lambda:zip && npm run lambda:update-fn"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "google-auth-library": "0.11.0"
+  }
+}

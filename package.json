@@ -1,0 +1,39 @@
+{
+  "name": "google-signin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --public --host 10.254.254.254",
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sdk": "2.124.0",
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.2",
+    "babel-preset-angular2": "0.0.2",
+    "babel-preset-env": "1.6.0",
+    "css-loader": "0.28.7",
+    "html-loader": "0.5.1",
+    "node-sass": "4.5.3",
+    "sass-loader": "6.0.6",
+    "to-string-loader": "1.1.5",
+    "webpack": "3.6.0",
+    "webpack-dev-server": "2.9.1"
+  },
+  "dependencies": {
+    "@angular/common": "4.4.4",
+    "@angular/compiler": "4.4.4",
+    "@angular/core": "4.4.4",
+    "@angular/http": "4.4.5",
+    "@angular/platform-browser": "4.4.4",
+    "@angular/platform-browser-dynamic": "4.4.4",
+    "@angular/router": "4.4.4",
+    "reflect-metadata": "0.1.10",
+    "rxjs": "5.4.3",
+    "zone.js": "0.8.18"
+  }
+}

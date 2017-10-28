@@ -1,0 +1,10 @@
+#!/bin/bash
+
+aws cloudformation create-stack \
+      --stack-name $PROJECT_NAME \
+      --template-body file://cloudformation.yaml \
+      --capabilities CAPABILITY_IAM \
+      --capabilities CAPABILITY_NAMED_IAM && \
+
+      aws cloudformation wait stack-create-complete \
+        --stack-name $PROJECT_NAME

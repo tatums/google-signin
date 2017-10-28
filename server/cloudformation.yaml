@@ -1,0 +1,136 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An AWS CloudFormation template
+
+Resources:
+  MyApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name:
+        Ref: AWS::StackName
+      Description: An Api
+
+  MyApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref MyApi
+      ParentId: !GetAtt [MyApi, RootResourceId]
+      PathPart: '{proxy+}'
+
+  ProxyResourceANY:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      RestApiId: !Ref MyApi
+      ResourceId: !Ref MyApiResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiLambda.Arn}/invocations
+
+  OptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      RestApiId: !Ref MyApi
+      ResourceId: !Ref MyApiResource
+      HttpMethod: OPTIONS
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+      - StatusCode: 200
+        ResponseModels:
+          application/json: 'Empty'
+        ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ProxyResourceANY
+    Properties:
+      RestApiId:
+        Ref: MyApi
+      StageName: v1
+
+  ApiGatewayLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - ApiLambda
+    Properties:
+      FunctionName: !GetAtt [ApiLambda, Arn]
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${MyApi}/*
+
+  ApiLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName:
+        !Sub ${AWS::StackName}
+      Handler: index.handler
+      Role:
+        !GetAtt [IamRoleLambda, Arn]
+      Code:
+        ZipFile:
+          exports.handler = function(event, context, cb) { return cb(null, {message:'Hello World'}); };
+      Runtime: nodejs6.10
+      MemorySize: 1024
+      Timeout: 20
+      Environment:
+        Variables:
+          region: !Sub ${AWS::Region}
+
+  IamRoleLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-role-lambda
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+
+  IamPolicyLambda:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName:
+        !Sub ${AWS::StackName}-lambda
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          Resource:
+            !Sub arn:aws:logs:${AWS::Region}:*:*
+        - Effect: Allow
+          Resource:
+            !Sub arn:aws:s3:::*
+          Action:
+          - s3:*
+      Roles:
+      - Ref: IamRoleLambda
