@@ -19,12 +19,12 @@ to API Gateway/Lambda endpoint to fetch some data.
   - Provides a buttons for Signin, SignOut, and revoke access
 
 ##### Services
-* [GoogleAuthService](./src/services/google.auth.service.js)
+* [GoogleAuthService](./src/app/services/google.auth.service.js)
   - wrapper for the google api
   - This is responsible for loading the [gapi client lib](https://developers.google.com/api-client-library/javascript/start/start-js)
-* [SecretDataService](./src/services/google.auth.service.js)
+* [SecretDataService](./src/app/services/google.auth.service.js)
   - This pulls data from our APIGateway/Lambda api
-* [UserService](./src/services/user.service.js)
+* [UserService](./src/app/services/user.service.js)
   - This holds the current user and auth token
 
 #### APIGateway/Lambda (server)
